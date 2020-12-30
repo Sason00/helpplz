@@ -1,0 +1,55 @@
+import turtle
+import time
+from copy import deepcopy
+import random
+
+
+def instructions():
+    t = turtle.Pen()
+    turtle.clearscreen()
+    t.goto(-250, -200)
+    t.write("                 INSTRUCTIONS: \n\n\n The goal of the game is to match\n"
+            "three of your selected marker (X or O)\n"
+            " in a row. However, the programed CPU \n"
+            "Player will be competing against you\n"
+            "also trying to get 3 markers in a row\n"
+            "and blocking your markers. If you nor\n"
+            " the CPU player can match 3 markers in\n"
+            "a row and the board is full, the game\n"
+            " ends as a tie! You place markers by\n"
+            "clicking the corresponding grid spot with\n"
+            "your mouse!\n\n\n  Click 'r' to return to the home screen!", font=("comic sans", 20))
+
+    turtle.listen()
+    turtle.onkey(main_menu, "r")
+
+t = turtle.Pen()
+winner = "Tie"
+import_cnt = 1
+def gamestart():
+    global t, count, board, location, winner, import_cnt
+    turtle.clearscreen()
+    t.hideturtle()
+    t.up()
+    import tictactoegame
+
+def main_menu():
+    global t
+    turtle.clearscreen()
+    turtle.setup(600, 800)
+    t.hideturtle()
+    turtle.hideturtle()
+    t.up()
+    t.speed(0)
+    t.goto(-200, 200)
+    t.write("TIC TAC TOE", font=("comic sans", 50, "bold"))
+    t.goto(-210, -20)
+    t.write('  Click "i" for Instructions\n                     Or\n            "s" to start!',
+            font=("comic sans", 25, "bold"))
+    turtle.listen()
+    turtle.onkey(instructions, 'i')
+    turtle.onkey(gamestart, "s")
+
+main_menu()
+turtle.done()
+
