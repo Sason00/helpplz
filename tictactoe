@@ -1,0 +1,225 @@
+import random
+from copy import deepcopy
+import time
+
+
+def loading_dots():
+    for i in range(3):
+        time.sleep(0.2)
+        print(".", end=" ")
+    print("")
+
+def main_menu():
+
+    while True:
+        inst_or_game = input("\nWelcome to 1-Player Tic-Tac-Toe! \n\nDo you want to:\n1 - Read the instructions \n2 - Start the game \nEnter option ('1' or '2') here: ")
+        if inst_or_game == "1":
+            print("\nThe goal of the game is to match three of your selected marker\n"
+                  "(X or O) in a row. However, the program (CPU Player) will be\n"
+                  "competing against you, also trying to get 3 markers in a row and\n"
+                  "blocking your markers. If you nor the CPU player can match 3 markers\n"
+                  "in a row and the board is full, the game ends as a tie! You place\n"
+                  "markers by entering the corresponding grid coordinate, which contains\n"
+                  "a letter from A to C next to a number from 1 to 3, with no space between.\n"
+                  "For example, you would need to enter b2 to place the X below:\n")
+
+            print_board(board)
+
+            print("\nFor more, just follow the on-screen instructions!")
+            continue
+        if inst_or_game == "2":
+            print("\nGame starting ", end="")
+            loading_dots()
+            break
+        else:
+            print("This is an invalid option. Please retry!\n")
+            continue
+
+def difficulty_select():
+    while True:
+        difficulty = int(input("\nWhat difficulty would you like to play on? \n1 - Hard \n2 - Medium\n3 - Easy \nEnter your choice ('1', '2', or '3') here: "))
+        if 1 <= difficulty <= 3:
+            break
+        else:
+            print("This is an invalid option. Please retry!\n")
+            continue
+    return difficulty
+
+def print_board(board):
+    print("\n       1     2     3\n")
+    print("A      " + board["a1"] + "  |  " + board["a2"] + "  |  " + board["a3"])
+    print("      --- + --- + ---")
+    print("B      " + board["b1"] + "  |  " + board["b2"] + "  |  " + board["b3"])
+    print("      --- + --- + ---")
+    print("C      " + board["c1"] + "  |  " + board["c2"] + "  |  " + board["c3"])
+
+def select_marker_and_who_starts():
+    while True:
+        user_choice = input("\nWhat marker do you want, X's or O's? \nEnter your choice ('X' or 'O') here: ").upper()
+        if user_choice == "X":
+            cpu_choice = "O"
+            break
+        if user_choice == "O":
+            cpu_choice = "X"
+            break
+        else:
+            print("This is an invalid option. Please retry!\n")
+            continue
+
+    print("\nI will now choose who starts", end="")
+    loading_dots()
+    select_starter = random.randint(1, 2)
+    if select_starter == 1:
+        select_starter = user_choice
+        print("I've chosen. You (%s's) start!" % user_choice)
+    else:
+        select_starter = cpu_choice
+        print("I've chosen. The CPU (%s's) starts!" % cpu_choice)
+
+    return user_choice, cpu_choice, select_starter
+
+
+def user_turn(board, user_choice):
+    print("\nUser's turn (%s's)\n(Enter a letter from A-C with a number from 1-3, no spaces)" % user_choice)
+    print("Make sure the spot isn't already occupied too!")
+    while True:
+        user_marker = input("\nEnter where you want to place your marker here: ")
+        if user_marker in board and board[user_marker] == " ":
+            break
+        elif user_marker in board and board[user_marker] != " ":
+            print("This space is already occupied. Please retry!")
+            continue
+        else:
+            print("This is an invalid option. Please retry!")
+            continue
+    board[user_marker] = user_choice
+
+def checker(board, letter):
+    return ((board["a1"] == board["a2"] == board["a3"] == letter) or
+            (board["b1"] == board["b2"] == board["b3"] == letter) or
+            (board["c1"] == board["c2"] == board["c3"] == letter) or
+            (board["a1"] == board["b1"] == board["c1"] == letter) or
+            (board["a2"] == board["b2"] == board["c2"] == letter) or
+            (board["a3"] == board["b3"] == board["c3"] == letter) or
+            (board["a1"] == board["b2"] == board["c3"] == letter) or
+            (board["a3"] == board["b2"] == board["c1"] == letter))
+
+def cpu_turn(board, cpu_choice, user_choice, difficulty):
+    print("\nCPU's turn ", end="")
+    loading_dots()
+
+    if difficulty != 3:
+        for i in board.keys():
+            copy_board = deepcopy(board)
+            if copy_board[i] == " ":
+                copy_board[i] = cpu_choice
+                if checker(copy_board, cpu_choice) == True:
+                    board[i] = cpu_choice
+                    return True
+
+        for i in board.keys():
+            copy_board = deepcopy(board)
+            if copy_board[i] == " ":
+                copy_board[i] = user_choice
+                if checker(copy_board, user_choice) == True:
+                    board[i] = cpu_choice
+                    return False
+
+        if difficulty == 1:
+            corners_of_board = ["a1", "a3", "c1", "c3"]
+            for corner in corners_of_board:
+                if board[corner] == " ":
+                    board[corner] = cpu_choice
+                    return False
+                else:
+                    continue
+
+            if board["b2"] == " ":
+                board["b2"] = cpu_choice
+                return False
+
+        sides_of_board = ["b1", "a2", "b3", "c2"]
+        for side in sides_of_board:
+            if board[side] == " ":
+                board[side] = cpu_choice
+                return False
+            else:
+                continue
+
+    if difficulty != 1:
+        temp_board_list = list(deepcopy(board))
+        while True:
+            randomized_location = random.choice(temp_board_list)
+            if board[randomized_location] == " ":
+                board[randomized_location] = cpu_choice
+                break
+            else:
+                continue
+
+
+
+
+
+board = {'a1': " ", 'a2': " ", 'a3': " ",
+         'b1': " ", 'b2': "X", 'b3': " ",
+         'c1': " ", 'c2': " ", 'c3': " "}
+
+main_menu()
+play_again_prompt = ""
+while play_again_prompt != "no":
+
+    difficulty = difficulty_select()
+    turns = 0
+
+    winner = False
+    board = {'a1': " ", 'a2': " ", 'a3': " ",
+             'b1': " ", 'b2': " ", 'b3': " ",
+             'c1': " ", 'c2': " ", 'c3': " "}
+
+    user_choice, cpu_choice, select_starter = select_marker_and_who_starts()
+
+
+    if select_starter == user_choice:
+        print_board(board)
+        while not winner and turns != 9:
+            potential_winner = "User"
+            user_turn(board, user_choice)
+            turns = turns + 1
+            winner = checker(board, user_choice)
+            print_board(board)
+            if not winner and turns != 9:
+                potential_winner = "CPU"
+                winner = cpu_turn(board, cpu_choice, user_choice, difficulty)
+                turns = turns + 1
+                print_board(board)
+    elif select_starter == cpu_choice:
+        while not winner and turns != 9:
+            potential_winner = "CPU"
+            winner = cpu_turn(board, cpu_choice, user_choice, difficulty)
+            turns = turns + 1
+            print_board(board)
+            if not winner and turns != 9:
+                potential_winner = "User"
+                user_turn(board, user_choice)
+                turns = turns + 1
+                winner = checker(board, user_choice)
+                print_board(board)
+
+    if turns == 9 and winner == False:
+        print("\nIt's a tie! You were close!")
+    elif potential_winner == "User":
+        print("\nYay! You (%s's) win!" % user_choice)
+    elif potential_winner == "CPU":
+        print("\nThe CPU (%s's) won. Good luck next time!" % cpu_choice)
+
+    while True:
+        play_again_prompt = input("\nWould you like to play again? \nEnter 'yes' or 'no' here: ").lower()
+        if play_again_prompt == "yes":
+            print("\nGet ready!!!\n")
+            break
+        elif play_again_prompt == "no":
+            print("\nOk. Thanks for playing!")
+            break
+        else:
+            print("This is an invalid option. Please retry!")
+
