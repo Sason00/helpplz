@@ -171,7 +171,7 @@ t= turtle.Pen()
 t.hideturtle()
 
 def rerun():
-    import fullfinalproject
+    # ------ change the file name to whatever u save it as: import fullfinalproject
 
 def quitgame():
     turtle.Screen().bye()
