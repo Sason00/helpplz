@@ -1,0 +1,259 @@
+import turtle
+import time
+from copy import deepcopy
+import random
+
+t = turtle.Pen()
+turtle.setup(600, 800)
+turtle.clearscreen()
+t.speed(0)
+t.up()
+for i in range(2):
+    t.goto(-100, -200)
+    t.down()
+    t.goto(-100, 600)
+    t.up()
+t.goto(100, -200)
+t.down()
+t.goto(100, 600)
+t.up()
+t.goto(-300, 200)
+t.down()
+t.goto(300, 200)
+t.up()
+t.goto(-300, 0)
+t.down()
+t.goto(300, 0)
+t.up()
+t.goto(-300, -200)
+t.down()
+t.goto(300, -200)
+t.up()
+
+count = 0
+board = {'a1': " ", 'a2': " ", 'a3': " ",
+         'b1': " ", 'b2': " ", 'b3': " ",
+         'c1': " ", 'c2': " ", 'c3': " "}
+location = ' '
+
+
+def checker(board, letter):
+    return ((board["a1"] == board["a2"] == board["a3"] == letter) or
+            (board["b1"] == board["b2"] == board["b3"] == letter) or
+            (board["c1"] == board["c2"] == board["c3"] == letter) or
+            (board["a1"] == board["b1"] == board["c1"] == letter) or
+            (board["a2"] == board["b2"] == board["c2"] == letter) or
+            (board["a3"] == board["b3"] == board["c3"] == letter) or
+            (board["a1"] == board["b2"] == board["c3"] == letter) or
+            (board["a3"] == board["b2"] == board["c1"] == letter))
+
+screen = turtle.Screen()
+
+difficulty = "0"
+while difficulty not in ["1", "2", "3"]:
+    difficulty = screen.textinput("", "What difficulty do you want to play on?\n 1 = Hard, 2 = Medium, 3 = Easy")
+difficulty = int(difficulty)
+user_choice = ""
+cpu_choice = ""
+while user_choice not in ["x", "o"]:
+    user_choice = screen.textinput("", "Will your marker be X's or O's?\n Type 'x' or 'o'")
+user_choice = user_choice.upper()
+if user_choice == "X":
+    cpu_choice = "O"
+else:
+    cpu_choice = "X"
+
+starter = random.choice(["User", "CPU"])
+who_starts = turtle.Pen()
+who_starts.hideturtle()
+who_starts.up()
+who_starts.goto(0, 70)
+who_starts.dot(500, "gray")
+who_starts.goto(-175, 50)
+who_starts.write("%s Starts" % starter, font=("arial", 50))
+time.sleep(1)
+who_starts.clear()
+
+
+def marker_placement(board):
+    try:
+        t.speed(0)
+        marker_x = 0
+        for i in list(deepcopy(board)):
+            if board[i] != " ":
+                y_values = {'a': 270, 'b': 70, 'c': -130}
+                for letter in ["a", "b", "c"]:
+                    if i[0] == letter:
+                        marker_y = y_values[letter]
+                        if i[1] == "1":
+                            marker_x = -225
+                        elif i[1] == "2":
+                            marker_x = -25
+                        elif i[1] == "3":
+                            marker_x = 175
+                t.hideturtle()
+                t.up()
+                t.goto(marker_x, marker_y)
+                t.down()
+                if board[i] == "X":
+                    t.color("red")
+                    t.write("X", font=("arial", 50))
+                    t.color("black")
+                elif board[i] == "O":
+                    t.color("blue")
+                    t.write("O", font=("arial", 50))
+                    t.color("black")
+                t.up()
+    except Exception:
+        pass
+
+
+def cpu_turn(board, cpu_choice, user_choice, difficulty):
+    global count
+    count = count + 1
+    if difficulty != 3:
+        for i in board.keys():
+            copy_board = deepcopy(board)
+            if copy_board[i] == " ":
+                copy_board[i] = cpu_choice
+                if checker(copy_board, cpu_choice) == True:
+                    board[i] = cpu_choice
+                    return True
+        for i in board.keys():
+            copy_board = deepcopy(board)
+            if copy_board[i] == " ":
+                copy_board[i] = user_choice
+                if checker(copy_board, user_choice) == True:
+                    board[i] = cpu_choice
+                    return False
+        if difficulty == 1:
+            corners_of_board = ["a1", "a3", "c1", "c3"]
+            for corner in corners_of_board:
+                if board[corner] == " ":
+                    board[corner] = cpu_choice
+                    return False
+                else:
+                    continue
+            if board["b2"] == " ":
+                board["b2"] = cpu_choice
+                return False
+
+            sides_of_board = ["b1", "a2", "b3", "c2"]
+            for side in sides_of_board:
+                if board[side] == " ":
+                    board[side] = cpu_choice
+                    return False
+                else:
+                    continue
+    if difficulty == 3 or difficulty == 2:
+        temp_board_list = list(deepcopy(board))
+        while True:
+            randomized_location = random.choice(temp_board_list)
+            if board[randomized_location] == " ":
+                board[randomized_location] = cpu_choice
+                break
+
+
+
+
+turn = False
+if starter == "CPU":
+    cpu_turn(board, cpu_choice, user_choice, difficulty)
+    marker_placement(board)
+    turn = True
+else:
+    turn = True
+
+potential_winner = "Tie"
+winner = False
+
+t= turtle.Pen()
+t.hideturtle()
+
+def rerun():
+    import fullfinalproject
+
+def quitgame():
+    turtle.Screen().bye()
+
+def replay_menu():
+    turtle.clearscreen()
+    t.up()
+    t.goto(-250, 25)
+    t.down()
+    if potential_winner == "Tie":
+        t.write("Its a tie!")
+    else:
+        t.write("And the winner is... %s!" % potential_winner, font=("arial", 25))
+    time.sleep(1)
+    turtle.listen()
+    t.goto(-250, -50)
+    t.write("Click 'y' to rerun the game, or 'q' to quit.", font=("arial", 10))
+    turtle.onkey(rerun, "y")
+    turtle.onkey(quitgame, "q")
+    turtle.done()
+
+
+
+def get_mouse_click_coor(x, y):
+    global location, count, turn, winner, potential_winner
+    potential_winner = "User"
+    if not winner or count < 9:
+        if turn:
+            turn = False
+            if y >= -200:
+                if 200 <= y <= 400:
+                    letter = "a"
+                elif 0 <= y <= 199:
+                    letter = "b"
+                elif -200 <= y <= -1:
+                    letter = "c"
+                if 100 <= x <= 300:
+                    location = letter + "3"
+                elif -100 <= x <= 99:
+                    location = letter + "2"
+                elif -300 <= x <= -101:
+                    location = letter + "1"
+            if board[location] == ' ':
+                board[location] = user_choice
+                marker_placement(board)
+                count = count + 1
+                winner = checker(board, user_choice)
+                if winner:
+                    print(potential_winner)
+                    replay_menu()
+                    # open('result.txt', 'w').write(f"winner is {potential_winner}")
+                    # turtle.Screen().bye()
+                else:
+                    if count == 9 and winner == False:
+                        potential_winner = "Tie"
+                        print(potential_winner)
+                        replay_menu()
+                        # turtle.Screen().bye()
+                    potential_winner = "CPU"
+                    cpu_turn(board, cpu_choice, user_choice, difficulty)
+                    time.sleep(0.5)
+                    marker_placement(board)
+                    winner = checker(board, cpu_choice)
+                    if winner:
+                        print(potential_winner)
+                        replay_menu()
+                        # open('result.txt', 'w').write(f"winner is {potential_winner}")
+                        # turtle.Screen().bye()
+                    else:
+                        if count == 9 and winner == False:
+                            potential_winner = "Tie"
+                            print(potential_winner)
+                            replay_menu()
+                            # turtle.Screen().bye()
+                    turn = True
+            else:
+                turn = True
+    else:
+        print(potential_winner)
+        open('result.txt', 'w').write(f"winner is Tie")
+        turtle.Screen().bye()
+
+
+turtle.onscreenclick(get_mouse_click_coor)
+turtle.mainloop()
